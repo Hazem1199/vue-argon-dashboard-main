@@ -87,7 +87,13 @@ const routes = [
   {
     path: "/user-information",
     name: "user information",
-    component: () => import("@/views/userInformation.vue"),},
+    component: () => import("@/views/userInformation.vue"),
+  },
+  {
+    path: "/team",
+    name: "team",
+    component: () => import("@/views/Team.vue"),
+  },
 ];
 
 const router = createRouter({

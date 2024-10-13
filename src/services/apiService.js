@@ -28,7 +28,7 @@ apiClient.interceptors.request.use(
 export default {
   // GET: جلب البيانات
   getUsers() {
-    return apiClient.get("/starts");
+    return apiClient.get("/starts?populate=*");
   },
 
   // POST: إضافة بيانات جديدة
@@ -79,5 +79,9 @@ export default {
   },
   getPermissions() {
     return apiClient.get("/perms?populate=*");
+  },
+
+  getPermissionsByRole(role) {
+    return apiClient.get(`/perms?role=${role}`);
   },
 };

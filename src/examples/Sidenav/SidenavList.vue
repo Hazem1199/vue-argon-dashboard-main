@@ -1,5 +1,5 @@
 <script setup>
-import { computed , onBeforeMount, ref } from "vue";
+import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
@@ -11,25 +11,33 @@ const showMenu = ref(false);
 const store = useStore();
 const isRTL = computed(() => store.state.isRTL);
 
-onBeforeMount(async() => {
-  await store.dispatch("fetchPermissions"); // جلب الصلاحيات من Vuex
-  await store.dispatch("fetchDataFromApi"); // جلب الأدوار من Vuex
-});
-
-const availablePermissions = computed(() => store.getters.permissions);
-const userData = computed(() => store.getters.dataFromApi);
+// جلب بيانات المستخدم من Vuex
+const userData = computed(() => store.getters.user);
 console.log(userData.value);
 
-console.log(availablePermissions.value);
+// تخزين الصلاحيات في متغير مركزي لتحسين الأداء وتقليل الوصول المتكرر
+const permissions = computed(() => userData.value?.user?.role?.permissions[0] || {});
 
-const canAddUser = computed(() => {
-  return availablePermissions.value.some(
-    (perm) => perm.attributes && perm.attributes.canAddUser === true
-  );
+// Function to check if the current user has a specific permission
+const hasPermission = (permissionName) => {
+  return computed(() => {
+    return permissions.value[permissionName] === true;
+  });
+};
+
+// أمثلة على استخدام الصلاحيات
+// Create dynamic computed properties for each permission based on user data
+const permissionKeys = Object.keys(permissions.value);
+const permissionComputed = {};
+
+permissionKeys.forEach((key) => {
+  permissionComputed[key] = hasPermission(key);
 });
 
+// Example usage
+const canAddUser = permissionComputed["canAddUser"];
 
-
+// Get route function to determine current route
 const getRoute = () => {
   const route = useRoute();
   const routeArr = route.path.split("/");
@@ -77,6 +85,18 @@ const getRoute = () => {
             v-if="canAddUser"
             :class="getRoute() === 'addUser' ? 'active' : ''"
             :navText="isRTL ? 'اضافة مستخدم' : 'add user'"
+          >
+            <template v-slot:icon>
+              <i
+                class="ni ni-single-02 text-primary text-sm opacity-10"
+              ></i>
+            </template>
+          </sidenav-item>
+          <sidenav-item
+            to="/team"
+            v-if="canAddUser"
+            :class="getRoute() === 'team' ? 'active' : ''"
+            :navText="isRTL ? 'فريق' : 'Team'"
           >
             <template v-slot:icon>
               <i

@@ -13,11 +13,11 @@ const store = useStore();
 const companyId = ref(localStorage.getItem("companyId"));
 
 
-const email = ref(""); // متغير لتخزين البريد الإلكتروني
-const showAlert = ref(false); // التحكم في عرض التنبيه
-const errorMessage = ref(""); // رسالة الخطأ
-const successMessage = ref(""); // رسالة النجا��
-const showSuccess = ref(false); // التحكم في عرض النجا��
+const email = ref(""); 
+const showAlert = ref(false);
+const errorMessage = ref(""); 
+const successMessage = ref(""); 
+const showSuccess = ref(false); 
 
 const body = document.getElementsByTagName("body")[0];
 

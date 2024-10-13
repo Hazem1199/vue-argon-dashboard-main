@@ -81,14 +81,17 @@ export default createStore({
       }
     },
     SET_USER(state, user) {
+      sessionStorage.clear();
       console.log(user.user);
       state.user = user;
-      localStorage.setItem("role", user.user.role.name);
+      sessionStorage.setItem("role", user.user.role.name);
+      // sessionStorage.setItem("companyId", user.user.companyId);
     },
     SET_TOKEN(state, token) {
       state.token = token; // لتحديث الـ token
     },
     SET_DATA_FROM_API(state, data) {
+      console.log(data);
       state.dataFromApi = data;
     },
     SET_ROLES(state, roles) {
@@ -200,7 +203,7 @@ export default createStore({
     async fetchDataFromApi({ commit }) {
       try {
         const response = await apiClient.getUsers();
-        commit("SET_DATA_FROM_API", response.data.data);
+        commit("SET_DATA_FROM_API", response.data.data);  
       } catch (error) {
         console.error(
           "Error fetching data:",
@@ -310,15 +313,26 @@ export default createStore({
         console.error("Error fetching roles:", error);
       }
     },
-    async fetchPermissions({ commit }) {
+    // async fetchPermissions({ commit }) {
+    //   try {
+    //     const response = await apiClient.getPermissions();
+    //     console.log("Permissions fetched successfully:", response.data.data);
+    //     commit("SET_PERMISSIONS", response.data.data);
+    //   } catch (error) {
+    //     console.error("Error fetching permissions:", error);
+    //   }
+    // },
+
+    async fetchPermissionsByRole({ commit }, role) {
       try {
-        const response = await apiClient.getPermissions();
-        console.log("Permissions fetched successfully:", response.data.data);
-        commit("SET_PERMISSIONS", response.data.data);
+        // استخدام API لجلب الصلاحيات بناءً على الدور الحالي
+        const response = await apiClient.getPermissionsByRole(role);
+        commit("SET_PERMISSIONS", response.data);
       } catch (error) {
-        console.error("Error fetching permissions:", error);
+        console.error("Error fetching permissions by role:", error);
       }
     },
+
     setEmail({ commit }, email) {
       commit("SET_EMAIL", email);
     },

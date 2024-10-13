@@ -1,0 +1,12 @@
+http://localhost:8080/reset-password?email=hazemessam.brooklyn@gmail.com
+
+add more data (col): 
+- company id
+- role 
+
+
+---------------------
+
+new table :
+
+- permassion for roles 

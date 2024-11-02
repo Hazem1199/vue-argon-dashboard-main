@@ -34,6 +34,12 @@ export default {
   // POST: إضافة بيانات جديدة
   addEmail(userData) {
     console.log(userData);
+    // const payload = {
+    //   data: {
+    //     email: userData.email,
+    //     role: userData.roleId,
+    //   },
+    // }
     return apiClient.post("/starts", userData);
   },
   checkEmail(email) {
@@ -57,6 +63,10 @@ export default {
     return apiClient.put(`/starts/${userId}`, updatedData);
   },
 
+  updateRole(userId, updatedData) {
+    return apiClient.put(`/starts/${userId}`, updatedData);
+  },
+
   // DELETE: حذف مستخدم
   deleteUser(userId) {
     return apiClient.delete(`/starts/${userId}`);
@@ -75,7 +85,10 @@ export default {
   },
 
   getRols() {
-    return apiClient.get("/rols");
+    return apiClient.get("/rols").then((response) => {
+      console.log("Roles from API:", response.data); // تحقق من البيانات
+      return response;
+    });
   },
   getPermissions() {
     return apiClient.get("/perms?populate=*");
@@ -84,4 +97,30 @@ export default {
   getPermissionsByRole(role) {
     return apiClient.get(`/perms?role=${role}`);
   },
-};
+  addPermassion(permissionsData) {
+    console.log("permissionsData", permissionsData);
+
+    // إرسال البيانات إلى مسار الـ API الخاص بالصلاحيات في Strapi
+    return apiClient.post("/perms", {
+      data: {
+        ...permissionsData, // الصلاحيات بوصفها Boolean مع companyId
+      },
+    });
+  },
+
+  addRoleWithPermissions(roleData) {
+    console.log("roleDataapi", roleData);
+
+    // تعديل البيانات المرسلة لتكون داخل كائن 'data' بما يتوافق مع Strapi
+    const payload = {
+      data: {
+        name: roleData.name, // اسم الدور
+        companyId: roleData.companyId, // رقم الشركة إذا كان متاحًا
+        permissions: roleData.permissions, // إرسال معرفات الصلاحيات
+      },
+    };
+
+    // إرسال البيانات إلى API
+    return apiClient.post("/rols", payload);
+  },
+};  

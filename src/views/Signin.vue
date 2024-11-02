@@ -90,7 +90,7 @@ const signIn = async () => {
     }
   } catch (error) {
     console.error("Error logging in:", error);
-    errorMessage.value = "حدث خطأ أثناء تسجيل الدخول. حاول مرة أخرى لاحقًا.";
+    errorMessage.value = t("loginError");
     showAlert.value = true;
 
     // إخفاء التنبيه بعد 3 ثوانٍ
@@ -121,6 +121,8 @@ const translations = {
     passwordValid: "Password is valid ✅",
     showPassword: "Show Password",
     hidePassword: "Hide Password",
+    showForgotPasswordForm: "Show Forgot Password Form",
+    loginError: "There was an error logging in. Please try again.",
   },
   ar: {
     signIn: "تسجيل الدخول",
@@ -138,6 +140,8 @@ const translations = {
     passwordValid: "كلمة المرور مطابقة للشروط ✅",
     showPassword: "إظهار كلمة المرور",
     hidePassword: "إخفاء كلمة المرور",
+    showForgotPasswordForm: "اظهار نموذج نسيت كلمة المرور",
+    loginError: "حدث خطأ أثناء تسجيل الدخول. الرجاء المحاولة مرة أخرى.",
   },
 };
 
@@ -211,7 +215,6 @@ const t = (key) => {
                         {{ t("passwordRequirements") }}
                       </p>
                     </div>
-
                     <p class="mx-auto mb-4 text-sm">
                       <a
                         href="javascript:;"
@@ -240,7 +243,7 @@ const t = (key) => {
                   <p class="mx-auto mb-4 text-sm">
                     {{ t("dontHaveAccount") }}
                     <a
-                      href="javascript:;"
+                      href="/start"
                       class="text-success text-gradient font-weight-bold"
                       >{{ t("signUp") }}</a
                     >

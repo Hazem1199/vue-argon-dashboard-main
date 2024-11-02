@@ -12,7 +12,7 @@ const routes = [
   {
     path: "/",
     name: "/",
-    redirect: "/dashboard-default",
+    component: () => import("../views/Start.vue"),
   },
   {
     path: "/dashboard-default",
@@ -93,6 +93,11 @@ const routes = [
     path: "/team",
     name: "team",
     component: () => import("@/views/Team.vue"),
+  },
+  {
+    path: "/add-role",
+    name: "add role",
+    component: () => import("@/views/AddRole.vue"),
   },
 ];
 

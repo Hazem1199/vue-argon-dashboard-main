@@ -1,11 +1,19 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
-import SidenavItem from "./SidenavItem.vue";
-import SidenavCard from "./SidenavCard.vue";
+// const route = useRoute();
 
+import SidenavItem from "./SidenavItem.vue";
+// import SidenavCard from "./SidenavCard.vue";
+import {
+  savePermissionsToLocalStorage,
+  loadPermissionsFromLocalStorage,
+  hasPermission,
+} from "@/utils/permissions.js"; // استيراد الوحدة
+
+// حالة فتح/إغلاق القائمة
 const showMenu = ref(false);
 
 const store = useStore();
@@ -15,27 +23,34 @@ const isRTL = computed(() => store.state.isRTL);
 const userData = computed(() => store.getters.user);
 console.log(userData.value);
 
-// تخزين الصلاحيات في متغير مركزي لتحسين الأداء وتقليل الوصول المتكرر
-const permissions = computed(() => userData.value?.user?.role?.permissions[0] || {});
+// استدعاء الصلاحيات من localStorage بناءً على المستخدم الحالي
+const permissions = ref(
+  loadPermissionsFromLocalStorage(userData.value?.user?.id) || {}
+);
 
-// Function to check if the current user has a specific permission
-const hasPermission = (permissionName) => {
-  return computed(() => {
-    return permissions.value[permissionName] === true;
-  });
-};
+console.log( permissions.value);
 
-// أمثلة على استخدام الصلاحيات
-// Create dynamic computed properties for each permission based on user data
-const permissionKeys = Object.keys(permissions.value);
-const permissionComputed = {};
+// في حال عدم وجود صلاحيات في localStorage، جلبها من Vuex
+onBeforeMount(() => {
+  if (!permissions.value || Object.keys(permissions.value).length === 0) {
+    const userRolePermissions =
+      userData.value?.user?.role?.permissions[0] || {};
+    permissions.value = userRolePermissions;
 
-permissionKeys.forEach((key) => {
-  permissionComputed[key] = hasPermission(key);
+    // حفظ الصلاحيات في localStorage بعد التشفير بناءً على المستخدم الحالي
+    savePermissionsToLocalStorage(permissions.value, userData.value?.user?.id);
+  }
 });
 
-// Example usage
-const canAddUser = permissionComputed["canAddUser"];
+
+// watch(route, () => {
+//   showMenu.value = false; // أغلق القائمة عند تغيير المسار
+// });
+
+// أمثلة على استخدام الصلاحيات
+const canAddUser = computed(() =>
+  hasPermission(permissions.value, "canAddUser")
+);
 
 // Get route function to determine current route
 const getRoute = () => {
@@ -43,7 +58,14 @@ const getRoute = () => {
   const routeArr = route.path.split("/");
   return routeArr[1];
 };
+
+const closeMenu = () => {
+  setTimeout(() => {
+    showMenu.value = false;
+  }, 100);
+};
 </script>
+
 <template>
   <div
     class="collapse navbar-collapse w-auto h-auto h-100"
@@ -66,13 +88,15 @@ const getRoute = () => {
         <a
           class="nav-link dropdown-toggle"
           href="#"
-          role="button"
-          data-toggle="dropdown"
+          data-bs-toggle="dropdown"
           aria-haspopup="true"
           aria-expanded="false"
           @click="showMenu = !showMenu"
+          @blur="closeMenu"
+          :class="[showMenu ? 'show' : '', darkMode ? 'text-white' : 'text-dark']"
+          id="navbarDropdown"
         >
-          <i class="ni ni-single-02 text-info text-sm opacity-10"></i>
+          <i class="ni ni-single-02 text-info text-sm opacity-10 text-center"></i>
           <span class="nav-link-text ms-1">Team Work</span>
         </a>
         <ul
@@ -87,9 +111,7 @@ const getRoute = () => {
             :navText="isRTL ? 'اضافة مستخدم' : 'add user'"
           >
             <template v-slot:icon>
-              <i
-                class="ni ni-single-02 text-primary text-sm opacity-10"
-              ></i>
+              <i class="ni ni-single-02 text-primary text-sm opacity-10"></i>
             </template>
           </sidenav-item>
           <sidenav-item
@@ -99,26 +121,32 @@ const getRoute = () => {
             :navText="isRTL ? 'فريق' : 'Team'"
           >
             <template v-slot:icon>
-              <i
-                class="ni ni-single-02 text-primary text-sm opacity-10"
-              ></i>
+              <i class="ni ni-single-02 text-primary text-sm opacity-10"></i>
+            </template>
+          </sidenav-item>
+          <sidenav-item
+            to="/add-role"
+            v-if="canAddUser"
+            :class="getRoute() === 'addRole' ? 'active' : ''"
+            :navText="isRTL ? 'اضافة دور' : 'Add Role'"
+          >
+            <template v-slot:icon>
+              <i class="ni ni-single-02 text-primary text-sm opacity-10"></i>
             </template>
           </sidenav-item>
           <sidenav-item
             to="/cards"
             :class="getRoute() === 'cards' ? 'active' : ''"
             :navText="isRTL ? 'الكارتات' : 'Cards'"
-          > 
+          >
             <template v-slot:icon>
-              <i
-                class="ni ni-app text-info text-sm opacity-10"
-              ></i>
+              <i class="ni ni-app text-info text-sm opacity-10"></i>
             </template>
           </sidenav-item>
         </ul>
       </li>
 
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <sidenav-item
           to="/tables"
           :class="getRoute() === 'tables' ? 'active' : ''"
@@ -154,19 +182,23 @@ const getRoute = () => {
             <i class="ni ni-app text-info text-sm opacity-10"></i>
           </template>
         </sidenav-item>
-      </li>
+      </li> -->
 
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <sidenav-item
           :to="isRTL ? '/dashboard-default' : '/rtl-page'"
-          :class="getRoute() === (isRTL ? '/dashboard-default' : '/rtl-page') ? 'active' : ''"
+          :class="
+            getRoute() === (isRTL ? '/dashboard-default' : '/rtl-page')
+              ? 'active'
+              : ''
+          "
           :navText="isRTL ? 'LTR' : 'RTL'"
         >
           <template v-slot:icon>
             <i class="ni ni-world-2 text-danger text-sm opacity-10"></i>
           </template>
         </sidenav-item>
-      </li>
+      </li> -->
 
       <li class="mt-3 nav-item">
         <h6
@@ -186,7 +218,7 @@ const getRoute = () => {
         </h6>
       </li>
 
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <sidenav-item
           to="/profile"
           :class="getRoute() === 'profile' ? 'active' : ''"
@@ -196,7 +228,7 @@ const getRoute = () => {
             <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
           </template>
         </sidenav-item>
-      </li>
+      </li> -->
 
       <li class="nav-item">
         <sidenav-item
@@ -222,28 +254,5 @@ const getRoute = () => {
         </sidenav-item>
       </li>
     </ul>
-  </div>
-
-  <div class="pt-3 mx-3 mt-3 sidenav-footer">
-    <sidenav-card
-      :card="{
-        title: 'Need Help?',
-        description: 'Please check our docs',
-        links: [
-          {
-            label: 'Documentation',
-            route:
-              'https://www.creative-tim.com/learning-lab/vue/overview/argon-dashboard/',
-            color: 'dark',
-          },
-          {
-            label: 'Buy now',
-            route:
-              'https://www.creative-tim.com/product/vue-argon-dashboard-pro?ref=vadp',
-            color: 'success',
-          },
-        ],
-      }"
-    />
   </div>
 </template>

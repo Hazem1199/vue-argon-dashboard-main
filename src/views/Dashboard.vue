@@ -8,6 +8,12 @@ import US from "@/assets/img/icons/flags/US.png";
 import DE from "@/assets/img/icons/flags/DE.png";
 import GB from "@/assets/img/icons/flags/GB.png";
 import BR from "@/assets/img/icons/flags/BR.png";
+import { computed } from "vue";
+import { useStore } from "vuex";
+const store = useStore();
+
+const userName = computed(() => store.getters.userName);
+
 
 const sales = {
   us: {
@@ -43,6 +49,7 @@ const sales = {
 <template>
   <div class="py-4 container-fluid">
     <div class="row">
+      <h4>welcome, {{ userName }}</h4>
       <div class="col-lg-12">
         <div class="row">
           <div class="col-lg-3 col-md-6 col-12">

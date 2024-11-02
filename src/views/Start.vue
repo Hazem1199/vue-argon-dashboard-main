@@ -3,12 +3,14 @@ import { ref, computed, onBeforeMount, onBeforeUnmount } from "vue";
 import { useStore } from "vuex"; // استدعاء Vuex
 import { useRouter } from "vue-router"; // استدعاء Vue Router
 
-import Navbar from "@/examples/PageLayout/Navbar.vue";
+// import Navbar from "@/examples/PageLayout/Navbar.vue";
 import AppFooter from "@/examples/PageLayout/Footer.vue";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonCheckbox from "@/components/ArgonCheckbox.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 import ArgonAlert from "@/components/ArgonAlert.vue";
+import LanguageSwitcher from "@/views/components/LanguageSwitcher.vue";
+
 
 const store = useStore();
 const router = useRouter(); // لإنشاء التوجيه
@@ -17,6 +19,8 @@ const email = ref(""); // متغير لتخزين البريد الإلكترو�
 const body = document.getElementsByTagName("body")[0];
 const errorMessage = ref(""); // لتخزين رسالة الخطأ
 const showAlert = ref(false); // حالة التحكم في عرض التنبيه
+const role = ref(44);
+
 
 // إضافة البريد الإلكتروني في Vuex وإرسال الطلب
 const submitForm = async () => {
@@ -40,8 +44,12 @@ const submitForm = async () => {
         showAlert.value = false;
       }, 3000);
     } else {
+      const formData = {
+        email: email.value,
+        roleId: role.value,
+      }
       // إذا لم يكن البريد الإلكتروني موجودًا، تابع التسجيل
-      await store.dispatch("submitEmail", email.value);
+      await store.dispatch("submitEmail", formData);
       router.push("/signup");
       showAlert.value = false;
     }
@@ -84,7 +92,7 @@ onBeforeUnmount(() => {
 // تعريف الترجمات داخل المكون
 const translations = {
   en: {
-    myTask: "My Task",
+    myTask: "1Task",
     newOrganization: "New Organization",
     enterDetails: "Enter your new company workspace details",
     email: "Email",
@@ -121,10 +129,10 @@ const t = (key) => {
 </script>
 
 <template>
-  <div class="container position-sticky top-0 z-index-sticky">
+  <LanguageSwitcher /> 
+  <!-- <div class="container position-sticky top-0 z-index-sticky">
     <div class="row">
       <div class="col-12">
-        <!-- Navbar مع زر تبديل اللغة -->
         <navbar
           isBlur="blur border-radius-lg my-3 py-2 start-0 end-0 mx-4 shadow"
           :darkMode="true"
@@ -132,7 +140,7 @@ const t = (key) => {
         />
       </div>
     </div>
-  </div>
+  </div> -->
   <main class="main-content mt-0">
     <section>
       <div class="page-header min-vh-100">
@@ -187,10 +195,11 @@ const t = (key) => {
                   <p class="mb-4 text-sm mx-auto">
                     {{ t("alreadyHaveAccount") }}
                     <a
-                      href="javascript:;"
+                      href="/signin"
                       class="text-success text-gradient font-weight-bold"
-                      >{{ t("signIn") }}</a
                     >
+                      {{ t("signIn") }}
+                    </a>
                   </p>
                 </div>
               </div>

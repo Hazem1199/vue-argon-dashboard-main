@@ -1,18 +1,16 @@
 <script setup>
-import { ref, onBeforeMount, onBeforeUnmount } from "vue";
+import { ref, onBeforeMount, onBeforeUnmount, watch } from "vue";
 import { useStore } from "vuex";
 import AuthorsTable from "./components/AuthorsTable.vue";
 import LanguageSwitcher from "@/views/components/LanguageSwitcher.vue";
 
 const store = useStore();
-// const companyId = ref(localStorage.getItem("companyId"));
-// const email = ref(""); // متغير لتخزين البريد الإلكتروني
 const showAlert = ref(false); // التحكم في عرض التنبيه
 const errorMessage = ref(""); // رسالة الخطأ
 const successMessage = ref(""); // رسالة النجاح
 const showSuccess = ref(false); // التحكم في عرض النجاح
 const employees = ref([]); // لتخزين بيانات الموظفين
-
+const componentKey = ref(0); // متغير لتغيير المفتاح وإعادة تحميل المكون
 const body = document.getElementsByTagName("body")[0];
 
 // دالة جلب بيانات الموظفين
@@ -32,6 +30,7 @@ const fetchEmployees = async () => {
     }
 
     showSuccess.value = true; // إظهار التنبيه بالنجاح
+    componentKey.value += 1; // تحديث المفتاح لإعادة تحميل المكون
   } catch (error) {
     console.error("Error fetching employees data:", error);
 
@@ -72,6 +71,15 @@ onBeforeUnmount(() => {
   store.state.showFooter = true;
   body.classList.add("bg-gray-100");
 });
+
+// مراقبة التحديثات في الموظفين وإعادة تحميل الكومبوننت
+watch(
+  () => store.getters.dataFromApi,
+  (newData) => {
+    employees.value = [...newData];
+    componentKey.value += 1; // إعادة تحميل المكون عند حدوث أي تحديث في البيانات
+  }
+);
 </script>
 
 <template>
@@ -80,7 +88,7 @@ onBeforeUnmount(() => {
     <div class="row">
       <div class="col-12">
         <!-- تمرير بيانات الموظفين إلى authors-table -->
-        <authors-table :employees="employees" />
+        <authors-table :key="componentKey" :employees="employees" />
       </div>
     </div>
   </div>

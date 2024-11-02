@@ -138,7 +138,7 @@ console.log("roles:", roles.value);
 
 const formattedRoles = computed(() => {
   return roles.value
-    .filter((role) => (role.companyId === currentCompanyId.value || role.companyId === currentUserId.value) && role.companyId !== null)
+    .filter((role) => (role.companyId == currentCompanyId.value || role.companyId == currentUserId.value) && role.companyId != null)
     .map((role) => ({
       value: role.id,
       label: role.name,

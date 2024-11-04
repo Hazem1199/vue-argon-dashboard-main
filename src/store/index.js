@@ -495,6 +495,11 @@ export default createStore({
       }
     },
 
+    async signOut() {
+      localStorage.clear();
+      sessionStorage.clear();
+    },
+
     setEmail({ commit }, email) {
       commit("SET_EMAIL", email);
     },

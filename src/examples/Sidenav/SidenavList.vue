@@ -2,6 +2,10 @@
 import { computed, ref, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
 
 // const route = useRoute();
 
@@ -58,6 +62,18 @@ const getRoute = () => {
   const routeArr = route.path.split("/");
   return routeArr[1];
 };
+
+const handleSignOut = () => {
+  console.log("handleSignOut");
+  store
+    .dispatch("signOut")
+    .then(() => {
+      router.push({ name: "Signin" });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
 
 const closeMenu = () => {
   setTimeout(() => {
@@ -230,7 +246,7 @@ const closeMenu = () => {
         </sidenav-item>
       </li> -->
 
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <sidenav-item
           to="/signin"
           :class="getRoute() === 'signin' ? 'active' : ''"
@@ -240,9 +256,22 @@ const closeMenu = () => {
             <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
           </template>
         </sidenav-item>
-      </li>
+      </li> -->
 
       <li class="nav-item">
+        <sidenav-item
+          to="/signin"
+          :class="getRoute() === 'signout' ? 'active' : ''"
+          :navText="isRTL ? 'تسجيل الخروج' : 'Sign Out'"
+          @click="handleSignOut"
+        >
+          <template v-slot:icon>
+            <i class="ni ni-button-power text-danger text-sm opacity-10"></i>
+          </template>
+        </sidenav-item>
+      </li>
+
+      <!-- <li class="nav-item">
         <sidenav-item
           to="/signup"
           :class="getRoute() === 'signup' ? 'active' : ''"
@@ -252,7 +281,7 @@ const closeMenu = () => {
             <i class="ni ni-collection text-info text-sm opacity-10"></i>
           </template>
         </sidenav-item>
-      </li>
+      </li> -->
     </ul>
   </div>
 </template>

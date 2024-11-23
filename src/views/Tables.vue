@@ -1,11 +1,11 @@
 <script setup>
-import ProjectsTable from "./components/ProjectsTable.vue";
+// import ProjectsTable from "./components/ProjectsTable.txt";
 </script>
 <template>
   <div class="py-4 container-fluid">
     <div class="mt-4 row">
       <div class="col-12">
-        <projects-table />
+        <!-- <projects-table /> -->
       </div>
     </div>
   </div>

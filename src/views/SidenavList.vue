@@ -174,19 +174,6 @@ const closeMenu = () => {
         </sidenav-item>
       </li>
 
-      <li class="nav-item">
-        <sidenav-item
-          to="/project"
-          :class="getRoute() === 'project' ? 'active' : ''"
-          :navText="isRTL ? 'المشاريع' : 'Project'"
-        >
-          <template v-slot:icon>
-            <i class="ni ni-app text-success text-sm opacity-10"></i>
-            
-          </template>
-        </sidenav-item>
-      </li>
-
       <!-- <li class="nav-item">
         <sidenav-item
           to="/tables"

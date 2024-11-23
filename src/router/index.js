@@ -109,6 +109,16 @@ const routes = [
     name: "Error",
     component: ErrorPage, // صفحة الخطأ
   },
+  {
+    path: "/department",
+    name: "department",
+    component: () => import("@/views/Department.vue"),
+  },
+  {
+    path: "/project",
+    name: "project",
+    component: () => import("@/views/Project.vue"),
+  },
 ];
 
 const router = createRouter({

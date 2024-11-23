@@ -72,6 +72,7 @@ const fetchPermissions = async () => {
   try {
     const response = await store.dispatch("fetchPermissions"); // جلب الأذونات من Vuex
     const uniquePermissions = new Set();
+    console.log("response", response);
 
     // استخراج الـ keys فقط مع استثناء الحقول المحددة
     response.forEach((perm) => {

@@ -36,9 +36,11 @@ const fetchEmployees = async () => {
 
     // عرض رسالة خطأ بناءً على اللغة
     if (store.getters.currentLanguage === "ar") {
-      errorMessage.value = "حدث خطأ أثناء جلب بيانات الموظفين. حاول مرة أخرى لاحقًا.";
+      errorMessage.value =
+        "حدث خطأ أثناء جلب بيانات الموظفين. حاول مرة أخرى لاحقًا.";
     } else {
-      errorMessage.value = "An error occurred while fetching employees data. Please try again later.";
+      errorMessage.value =
+        "An error occurred while fetching employees data. Please try again later.";
     }
 
     showAlert.value = true; // إظهار التنبيه بالخطأ
@@ -56,7 +58,9 @@ onBeforeMount(async () => {
 
   // تحديث اتجاه النص واللغة عند تحميل المكون
   const isRTL = store.getters.currentLanguage === "ar";
-  document.querySelector("html").setAttribute("lang", store.getters.currentLanguage);
+  document
+    .querySelector("html")
+    .setAttribute("lang", store.getters.currentLanguage);
   document.querySelector("html").setAttribute("dir", isRTL ? "rtl" : "ltr");
   document.querySelector("#app").classList.toggle("rtl", isRTL);
 

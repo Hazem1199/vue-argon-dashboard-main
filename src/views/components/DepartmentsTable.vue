@@ -5,55 +5,43 @@
                 <thead>
                     <tr>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                            {{ t("projectName") }}
-                        </th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                            {{ t("CreatedBy") }}
+                            {{ t("departmentName") }}
                         </th>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                             {{ t("assignManager") }}
                         </th>
-                        <!-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                             {{ t("viceManager") }}
-                        </th> -->
+                        </th>
                         <th class="text-secondary opacity-7"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="project in props.projects" :key="project.id">
+                    <tr v-for="department in props.departments" :key="department.id">
                         <td>
                             <div class="d-flex px-2 py-1">
                                 <div class="d-flex flex-column justify-content-center text-sm">
-                                    <h6 class="mb-0 text-sm">{{ project.neme }}</h6>
+                                    <h6 class="mb-0 text-sm">{{ department.departmentName }}</h6>
                                 </div>
                             </div>
                         </td>
-
-                        <td>
-                            <div class="d-flex px-2 py-1">
-                                <div class="d-flex flex-column justify-content-center text-sm">
-                                    <h6 class="mb-0 text-sm">{{ project.createdOwner }}</h6>
-                                </div>
-                            </div>
-                        </td>
-                        
                         <td>
                             <p class="text-xs font-weight-bold mb-0">
-                                {{ getManagerName(project) }}
+                                {{ getManagerName(department) }}
                             </p>
                         </td>
-                        <!-- <td>
+                        <td>
                             <p class="text-xs font-weight-bold mb-0">
-                                {{ getViceManagerName(project) }}
+                                {{ getViceManagerName(department) }}
                             </p>
-                        </td> -->
+                        </td>
                         <td class="align-middle">
-                            <a v-show="canEditProject" href="javascript:;"
-                                class="text-secondary font-weight-bold text-xs" @click="openEditModal(project)">
+                            <a v-show="canEditDepartment" href="javascript:;"
+                                class="text-secondary font-weight-bold text-xs" @click="openEditModal(department)">
                                 {{ t("edit") }}
                             </a>
-                            <a v-show="canDeleteProject" href="javascript:;"
-                                class="text-danger font-weight-bold text-xs ms-2" @click="confirmDelete(project)">
+                            <a v-show="canDeleteDepartment" href="javascript:;"
+                                class="text-danger font-weight-bold text-xs ms-2" @click="confirmDelete(department)">
                                 {{ t("delete") }}
                             </a>
                         </td>
@@ -65,25 +53,25 @@
 
     <div v-if="showEditPopup" class="popup-overlay">
         <transition name="modal-fade">
-            <ArgonModal v-if="showEditPopup" :title="t('editProject')" @close="closeEditPopup">
+            <ArgonModal v-if="showEditPopup" :title="t('editDepartment')" @close="closeEditPopup">
                 <template #default>
-                    <label>{{ t("projectName") }}:</label>
-                    <input v-model="editProjectName" class="form-control" />
+                    <label>{{ t("departmentName") }}:</label>
+                    <input v-model="editDepartmentName" class="form-control" />
                     <div v-if="employees.length > 0">
                         <label>{{ t("assignManager") }}:</label>
                         <argon-select v-model="selectedEmployee" :options="employeeOptions"
                             :placeholder="t('assignManager')" class="form-control" />
                     </div>
-                    <!-- <div v-if="employees.length > 0">
+                    <div v-if="employees.length > 0">
                         <label>{{ t("viceManager") }}:</label>
                         <argon-select v-model="selectedEmployee" :options="employeeOptions"
                             :placeholder="t('viceManager')" class="form-control" />
-                    </div> -->
+                    </div>
                 </template>
 
                 <template #footer>
                     <argon-button @click="closeEditPopup">{{ t("close") }}</argon-button>
-                    <argon-button @click="updateProject" :disabled="isLoading">
+                    <argon-button @click="updateDepartment" :disabled="isLoading">
                         <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status"
                             aria-hidden="true"></span>
                         {{ isLoading ? t("saving") : t("update") }}
@@ -92,7 +80,7 @@
 
                 <template #title>
                     <i class="fas fa-user-edit me-2"></i>
-                    {{ t("editProject") }}
+                    {{ t("editDepartment") }}
                 </template>
             </ArgonModal>
         </transition>
@@ -122,7 +110,7 @@ const currentUserId = computed(() => store.getters.userId);
 console.log("currentUserId:", currentUserId.value);
 
 const props = defineProps({
-    projects: {
+    departments: {
         type: Array,
         required: true,
     },
@@ -136,7 +124,8 @@ onMounted(() => {
 const employees = ref([]);
 // const componentKey = ref(0); // متغير لتغيير المفتاح وإعادة تحميل المكون
 // const showEditPopup = ref(false);
-
+// const editDepartmentName = ref("");
+// const currentEditingDepartmentId = ref(null);
 // const isLoading = ref(false);
 // const successMessage = ref("");
 const errorMessage = ref("");
@@ -187,50 +176,50 @@ onBeforeMount(() => {
 });
 
 const showEditPopup = ref(false);
-const editProjectName = ref("");
-const currentEditingProjectId = ref(null);
+const editDepartmentName = ref("");
+const currentEditingDepartmentId = ref(null);
 
-console.log("props.projects:", props.projects);
+console.log("props.departments:", props.departments);
 
 const currentLanguage = computed(() => store.getters.currentLanguage);
 const t = (key) => translations[currentLanguage.value][key];
 
-const canEditProject = computed(() =>
-    hasPermission(permissions.value, "canEditProject")
+const canEditDepartment = computed(() =>
+    hasPermission(permissions.value, "canEditDepartment")
 );
-const canDeleteProject = computed(() =>
-    hasPermission(permissions.value, "canDeleteProject")
+const canDeleteDepartment = computed(() =>
+    hasPermission(permissions.value, "canDeleteDepartment")
 );
 
-const openEditModal = (project) => {
-    console.log(project);
-    currentEditingProjectId.value = project.id;
-    editProjectName.value = project.neme;
+const openEditModal = (department) => {
+    console.log(department);
+    currentEditingDepartmentId.value = department.id;
+    editDepartmentName.value = department.departmentName;
     showEditPopup.value = true;
 };
 
 const closeEditPopup = () => {
     showEditPopup.value = false;
-    editProjectName.value = "";
-    currentEditingProjectId.value = null;
+    editDepartmentName.value = "";
+    currentEditingDepartmentId.value = null;
 };
 
 const isLoading = ref(false);
 
-const updateProject = async () => {
+const updateDepartment = async () => {
     isLoading.value = true;
-    const project = {
-        id: currentEditingProjectId.value,
-        neme: editProjectName.value,
+    const department = {
+        id: currentEditingDepartmentId.value,
+        name: editDepartmentName.value,
     };
 
     try {
-        await store.dispatch("updateProject", project);
+        await store.dispatch("updateDepartment", department);
         closeEditPopup();
         componentKey.value += 1;
-        await store.dispatch("fetchProjects");
+        await store.dispatch("fetchDepartments");
     } catch (error) {
-        console.error("Error updating project:", error);
+        console.error("Error updating department:", error);
     } finally {
         isLoading.value = false;
     }
@@ -240,7 +229,7 @@ const updateProject = async () => {
 //     componentKey.value += 1;
 // }
 
-const confirmDelete = (project) => {
+const confirmDelete = (department) => {
     Swal.fire({
         title: t("deleteConfirmationTitle"),
         text: t("deleteConfirmationText"),
@@ -250,50 +239,48 @@ const confirmDelete = (project) => {
         cancelButtonText: t("close"),
     }).then(async (result) => {
         if (result.isConfirmed) {
-            await deleteProject(project.id);
+            await deleteDepartment(department.id);
         }
     });
 };
 
-const deleteProject = async (projectId) => {
-    console.log(projectId);
+const deleteDepartment = async (departmentId) => {
+    console.log(departmentId);
     try {
-        await store.dispatch("deleteProject", projectId);
-        await store.dispatch("fetchProjects");
+        await store.dispatch("deleteDepartment", departmentId);
+        await store.dispatch("fetchDepartments");
         componentKey.value += 1;
     } catch (error) {
-        console.error("Error deleting project:", error);
+        console.error("Error deleting department:", error);
     }
 };
 
 const translations = {
     en: {
-        projectTable: "Projects Table",
-        projectName: "Project Name",
+        departmentsTable: "Departments Table",
+        departmentName: "Department Name",
         edit: "Edit",
         delete: "Delete",
-        deleteConfirmationTitle: "Delete Project",
-        deleteConfirmationText: "Are you sure you want to delete this project?",
+        deleteConfirmationTitle: "Delete Department",
+        deleteConfirmationText: "Are you sure you want to delete this department?",
         close: "Close",
         saving: "Saving...",
         update: "Update",
         assignManager: "Manager",
         viceManager: "Vice Manager",
-        CreatedBy : "Created By",
     },
     ar: {
-        projectTable: "جدول المشاريع",
-        projectName: "اسم المشروع",
+        departmentsTable: "جدول الأقسام",
+        departmentName: "اسم القسم",
         edit: "تعديل",
         delete: "حذف",
-        deleteConfirmationTitle: "حذف المشروع",
-        deleteConfirmationText: "هل تريد حذف هذا المشروع؟",
+        deleteConfirmationTitle: "حذف القسم",
+        deleteConfirmationText: "هل تريد حذف هذا القسم؟",
         close: "إغلاق",
         saving: "يتم الحفظ...",
         update: "تحديث",
         assignManager: "المدير",
         viceManager: "مدير مساعد",
-        CreatedBy: "منشء بواسطة",
     },
 };
 
@@ -309,14 +296,14 @@ const employeeOptions = computed(() => {
 });
 
 // Function to get the manager's name
-const getManagerName = (project) => {
-    const manager = project.employees.find(emp => emp.position.name === 'Manager');
+const getManagerName = (department) => {
+    const manager = department.employees.find(emp => emp.position.name === 'Manager');
     return manager ? manager.name : 'No Manager';
 };
 
 // Function to get the vice manager's name
-// const getViceManagerName = (project) => {
-//     const viceManager = project.employees.find(emp => emp.position.name === 'Vice Manager');
-//     return viceManager ? viceManager.name : 'No Vice Manager';
-// };
+const getViceManagerName = (department) => {
+    const viceManager = department.employees.find(emp => emp.position.name === 'Vice Manager');
+    return viceManager ? viceManager.name : 'No Vice Manager';
+};
 </script>

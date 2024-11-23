@@ -17,6 +17,12 @@
               <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                 {{ t("role") }}
               </th>
+              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                {{ t("department") }}
+              </th>
+              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                {{ t("position") }}
+              </th>
               <th class="text-secondary opacity-7"></th>
             </tr>
           </thead>
@@ -36,6 +42,16 @@
               <td>
                 <p class="text-xs font-weight-bold mb-0">
                   {{ employee.role.name }}
+                </p>
+              </td>
+              <td>
+                <p class="text-xs font-weight-bold mb-0">
+                  {{ employee.department ? employee.department.departmentName : 'No Department' }}
+                </p>
+              </td>
+              <td>
+                <p class="text-xs font-weight-bold mb-0">
+                  {{ employee.position ? employee.position.name : 'No Position' }}
                 </p>
               </td>
               <td class="align-middle">
@@ -60,6 +76,11 @@
           <input v-model="selectedEmployee.name" class="form-control" />
           <label>{{ t("role") }}:</label>
           <argon-select v-model="selectedEmployee.roleId" :options="formattedRoles" :placeholder="t('role')" class="form-control" />
+          <label>{{ t("department") }}:</label>
+          <argon-select v-model="selectedEmployee.departmentId" :options="formattedDepartments" :placeholder="t('department')" class="form-control" />
+          <label>{{ t("position") }}:</label>
+          <argon-select v-model="selectedEmployee.positionId" :options="formattedPositions" :placeholder="t('position')" class="form-control" />
+
         </template>
 
         <template #footer>
@@ -145,6 +166,31 @@ const formattedRoles = computed(() => {
     }));
 });
 
+const departments = computed(() => store.getters.departments);
+console.log("departments:", departments.value);
+
+const formattedDepartments = computed(() => {
+  return departments.value
+    .filter((department) => (department.companyID == currentCompanyId.value || department.companyID == currentUserId.value) && department.companyID != null)
+    .map((department) => ({
+      value: department.id,
+      label: department.departmentName,
+    }));
+});
+
+const positions = computed(() => store.getters.positions);
+console.log("positions:", positions.value);
+
+const formattedPositions = computed(() => {
+  return positions.value
+    .map((position) => ({
+      value: position.id,
+      label: position.name,
+    }));
+});
+
+// console.log("formattedPositions:", formattedPositions.value);
+
 const translations = {
   en: {
     employeesTable: "Employees Table",
@@ -160,6 +206,8 @@ const translations = {
     updateSuccess: "Data updated successfully!",
     deleteConfirmationText: "Are you sure you want to delete this user?",
     deleteSuccess: "User deleted successfully!",
+    department: "Department",
+    position: "Position",
   },
   ar: {
     employeesTable: "جدول الموظفين",
@@ -175,6 +223,8 @@ const translations = {
     updateSuccess: "تم تحديث البيانات بنجاح!",
     deleteConfirmationText: "هل تريد حذف هذا المستخدم؟",  
     deleteSuccess: "تم حذف المستخدم بنجاح!",
+    department: "القسم",
+    position: "منصب",
   },
 };
 
@@ -225,8 +275,10 @@ const saveChanges = async () => {
     const userId = selectedEmployee.value.id;
     const roleId = selectedEmployee.value.roleId;
     const userName = selectedEmployee.value.name;
+    const departmentId = selectedEmployee.value.departmentId;
+    const positionId = selectedEmployee.value.positionId;
 
-    await store.dispatch("updateRole", { userId, roleId, userName });
+    await store.dispatch("updateRole", { userId, roleId, userName, departmentId, positionId });
 
     isLoading.value = false;
     successMessage.value = t("updateSuccess");
@@ -286,6 +338,8 @@ watch(
 
 onMounted(() => {
   store.dispatch("fetchRoles");
+  store.dispatch("fetchDepartments");
+  store.dispatch("fetchPositions");
 });
 </script>
 

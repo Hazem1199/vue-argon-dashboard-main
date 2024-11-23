@@ -115,11 +115,6 @@ const sendInvitation = async () => {
   }
 };
 
-// إضافة المراقبة للتأكد من تحميل `companyId` و`userId`
-// watch([companyId, userId], ([newCompanyId, newUserId]) => {
-//   console.log("Updated companyId:", newCompanyId);
-//   console.log("Updated userId:", newUserId);
-// });
 </script>
 
 <template>

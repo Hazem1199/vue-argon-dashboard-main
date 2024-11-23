@@ -47,6 +47,9 @@ export default createStore({
     permissions: [],
     token:
       "d2d25b8a0d6f8fa0ebce3488fc1f4dfcd8703b6cc43c48d6ce673428a05a6d36c51ce3af8e8689e5afcb9f00676e9065be21d14760243ce2ac551d67dfd5f73e77aeee80b23a0b922cda371315eb7d3b6fad6b70ee0aa91872caae7c30d0d0485502ad0c37881eecd3b8eeadee651adaed3075ecde115934c16b3e85fc0c2f61", // إضافة الـ token هنا
+    departments: [],
+    positions: [],
+    projects: [],
   },
   mutations: {
     // تحميل بيانات المستخدم من `localStorage` عند بدء التشغيل
@@ -195,6 +198,55 @@ export default createStore({
     // SET_PERMISSIONS(state, permissions) {
     //   state.permissions = permissions;
     // },
+    SET_DEPARTMENT(state, department) {
+      console.log("department", department);
+      state.department = department;
+    },
+    setDepartments(state, departments) {
+      console.log("departments", departments);
+      state.departments = departments.filter(
+        (department) =>
+          (department.companyID == state.companyId ||
+            department.companyID == state.userId) &&
+          department.companyID != null
+      );
+    },
+    removeDepartment(state, departmentId) {
+      state.departments = state.departments.filter(
+        (dept) => dept.id !== departmentId
+      );
+    },
+    updateDepartment(state, updatedDepartment) {
+      const index = state.departments.findIndex(
+        (dept) => dept.id === updatedDepartment.id
+      );
+      if (index !== -1) {
+        state.departments.splice(index, 1, updatedDepartment);
+      }
+    },
+    SET_POSITIONS(state, positions) {
+      console.log("positions", positions);
+      state.positions = positions;
+    },
+    SET_PROJECT(state, project) {
+      state.projects = project; // إضافة المشروع الجديد إلى قائمة المشاريع
+    },
+    SET_ADD_PROJECT(state, project) {
+      state.projects.push(project);
+    },
+    updateProject(state, updatedProject) {
+      const index = state.projects.findIndex(
+        (project) => project.id === updatedProject.id
+      );
+      if (index !== -1) {
+        state.projects.splice(index, 1, updatedProject);
+      }
+    },
+    removeProject(state, projectId) {
+      state.projects = state.projects.filter(
+        (project) => project.id !== projectId
+      );
+    }
   },
   actions: {
     toggleSidebarColor({ commit }, payload) {
@@ -231,10 +283,10 @@ export default createStore({
     },
 
     async submitEmail({ commit }, formData) {
-      console.log( " formData : " ,formData);
+      console.log(" formData : ", formData);
       try {
         // إرسال البريد الإلكتروني إلى الخادم
-        const response = await apiClient.addEmail( formData  );
+        const response = await apiClient.addEmail(formData);
         console.log("response.data:", response.data);
         console.log("response.data.data:", response.data.data);
         console.log("response.data.data.id:", response.data.data.id);
@@ -278,9 +330,19 @@ export default createStore({
       }
     },
 
-    async updateRole({ commit }, { userId, roleId, userName }) {
+    async updateRole(
+      { commit },
+      { userId, roleId, userName, departmentId, positionId }
+    ) {
       try {
-        const userData = { data: { role: roleId, name: userName } };
+        const userData = {
+          data: {
+            role: roleId,
+            name: userName,
+            department: departmentId,
+            position: positionId,
+          },
+        };
         const response = await apiClient.updateRole(userId, userData);
         console.log("Role updated:", response.data);
         if (response.data.success) {
@@ -409,7 +471,7 @@ export default createStore({
     async sendInvitation({ commit }, userData) {
       console.log(userData);
       try {
-        // إرسال البريد الإلكتروني إلى الخادم
+        // إرسل البريد الإلكتروني إلى الخادم
         const response = await apiClient.sendInvitation({
           data: {
             email: userData.email,
@@ -454,6 +516,17 @@ export default createStore({
         throw error;
       }
     },
+    async fetchPositions({ commit }) {
+      try {
+        const response = await apiClient.getPositions();
+        console.log("Fetched positions:", response.data.data);
+        commit("SET_POSITIONS", response.data.data);
+        return response.data.data;
+      } catch (error) {
+        console.error("Error fetching positions:", error);
+        throw error;
+      }
+    },
 
     async addRoleWithPermissions({ commit }, roleData) {
       try {
@@ -467,7 +540,9 @@ export default createStore({
       }
     },
     async addPermissions({ commit }, permissionsData) {
+      console.log("permissionsData", permissionsData);
       try {
+        ``;
         // استدعاء API لإضافة الصلاحيات
         const response = await apiClient.addPermassion(permissionsData);
         console.log("Permissions added:", response.data);
@@ -520,6 +595,111 @@ export default createStore({
     loadCompanyId({ commit }) {
       commit("LOAD_COMPANY_ID");
     },
+    async addDepartment({ commit }, department) {
+      console.log("department", department);
+      try {
+        const response = await apiClient.addDepartment({
+          departmentName: department.departmentName,
+          companyId: department.companyId,
+        });
+        console.log("Department added:", response.data);
+        commit("SET_DEPARTMENT", response.data);
+        // يمكنك تحديث الـ state هنا إذا لزم الأمر
+      } catch (error) {
+        console.error("Error adding department:", error);
+      }
+    },
+    async fetchDepartments({ commit }) {
+      try {
+        const response = await apiClient.getDepartments();
+        commit("setDepartments", response.data.data);
+        console.log("response.data", response.data.data);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    },
+    async deleteDepartment({ commit }, departmentId) {
+      console.log("departmentId", departmentId);
+      try {
+        await apiClient.deleteDepartment(departmentId);
+        commit("removeDepartment", departmentId);
+        return { success: true, message: "Department deleted successfully" };
+      } catch (error) {
+        console.error("Error deleting department:", error);
+        return { success: false, message: "Error deleting department" };
+      }
+    },
+    async updateDepartment({ commit }, department) {
+      console.log("department", department);
+      try {
+        const response = await apiClient.updateDepartment({
+          id: department.id,
+          departmentName: department.name,
+        });
+        commit("updateDepartment", response.data);
+        return { success: true, message: "Department updated successfully" };
+      } catch (error) {
+        console.error("Error updating department:", error);
+        return { success: false, message: "Error updating department" };
+      }
+    },
+
+    // projects
+
+    async fetchProjects({ commit }) {
+      try {
+        const response = await apiClient.getProjects();
+        commit("SET_PROJECT", response.data.data);
+        console.log("response.data", response.data.data);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    },
+
+    async addProject({ commit }, project) {
+      console.log("project", project);
+      try {
+        // const response = await apiClient.addDepartment({
+        //   departmentName: department.departmentName,
+        //   companyId: department.companyId,
+        // });
+        const response = await apiClient.addProject({
+          neme: project.neme,
+          companyId: project.companyId,
+          createdOwner: project.createdOwner,
+        });
+        commit("SET_ADD_PROJECT", response.data);
+        return { success: true, message: "Project added successfully" };
+      } catch (error) {
+        console.error("Error adding project:", error);
+        return { success: false, message: "Error adding project" };
+      }
+    },
+    async updateProject({ commit }, project) {
+      console.log("department", project);
+      try {
+        const response = await apiClient.updateProject({
+          id: project.id,
+          neme: project.neme,
+        });
+        commit("updateProject", response.data);
+        return { success: true, message: "Project updated successfully" };
+      } catch (error) {
+        console.error("Error updating Project:", error);
+        return { success: false, message: "Error updating Project" };
+      }
+    },
+    async deleteProject({ commit }, projectId) {
+      console.log("projectId", projectId);
+      try {
+        await apiClient.deleteProject(projectId);
+        commit("removeProject", projectId);
+        return { success: true, message: "Project deleted successfully" };
+      } catch (error) {
+        console.error("Error deleting project:", error);
+        return { success: false, message: "Error deleting project" };
+      }
+    },
   },
 
   getters: {
@@ -538,5 +718,9 @@ export default createStore({
     updateRole: (state) => state.updateRole,
     permId: (state) => state.permId,
     userName: (state) => state.name,
+    department: (state) => state.department,
+    departments: (state) => state.departments,
+    positions: (state) => state.positions,
+    projects: (state) => state.projects,
   },
 });

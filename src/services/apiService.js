@@ -123,4 +123,37 @@ export default {
     // إرسال البيانات إلى API
     return apiClient.post("/rols", payload);
   },
-};  
+
+  addDepartment(departmentData) {
+    console.log("departmentData", departmentData);
+    return apiClient.post("/departments", { data: { departmentName: departmentData.departmentName, companyID: departmentData.companyId } });
+  },
+  getDepartments() {
+    return apiClient.get("/departments");
+  },
+  deleteDepartment(departmentId) {
+    return apiClient.delete(`/departments/${departmentId}`);
+  },
+  updateDepartment(department) {
+    return apiClient.put(`/departments/${department.id}`, { data: { departmentName: department.departmentName } }); 
+  },
+  getPositions() {
+    return apiClient.get("/positions").then((response) => {
+      console.log("Positions from API:", response.data); // Verify the data
+      return response;
+    });
+  },
+  addProject(projectData) {
+    console.log("Adding project:", projectData);
+    return apiClient.post("/projects", { data: { neme: projectData.neme, companyID: projectData.companyId, createdOwner: projectData.createdOwner } }); // تأكد من أن الـ API يتوقع البيانات بهذا الشكل
+  },
+  getProjects() {
+    return apiClient.get("/projects");
+  },
+  updateProject(project) {
+    return apiClient.put(`/projects/${project.id}`, { data: { neme: project.neme } });
+  },
+  deleteProject(projectId) {
+    return apiClient.delete(`/projects/${projectId}`);
+  },
+};

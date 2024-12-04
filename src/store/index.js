@@ -45,9 +45,9 @@ export default createStore({
     updateRole: [],
     nameOfRoles: [],
     permissions: [],
+    departments: [], // لتخزين الأقسام في الـ state
     token:
       "d2d25b8a0d6f8fa0ebce3488fc1f4dfcd8703b6cc43c48d6ce673428a05a6d36c51ce3af8e8689e5afcb9f00676e9065be21d14760243ce2ac551d67dfd5f73e77aeee80b23a0b922cda371315eb7d3b6fad6b70ee0aa91872caae7c30d0d0485502ad0c37881eecd3b8eeadee651adaed3075ecde115934c16b3e85fc0c2f61", // إضافة الـ token هنا
-    departments: [],
     positions: [],
     projects: [],
   },
@@ -246,7 +246,7 @@ export default createStore({
       state.projects = state.projects.filter(
         (project) => project.id !== projectId
       );
-    }
+    },
   },
   actions: {
     toggleSidebarColor({ commit }, payload) {
@@ -346,7 +346,7 @@ export default createStore({
         const response = await apiClient.updateRole(userId, userData);
         console.log("Role updated:", response.data);
         if (response.data.success) {
-          // إذا كانت البيانات صحيحة
+          // إذا كانت البيانات ص��يحة
           commit("SET_USER_ROLES", response.data);
           return { success: true };
         } else {
@@ -419,7 +419,7 @@ export default createStore({
         });
 
         if (response.data.success) {
-          // مسح البيانات السابقة قبل تعيين الجديدة
+          // مسح البيانات السابقة قبل تع��ين الجديدة
           commit("CLEAR_USER_DATA");
 
           // تعيين البيانات الجديدة
@@ -629,21 +629,40 @@ export default createStore({
         return { success: false, message: "Error deleting department" };
       }
     },
-    async updateDepartment({ commit }, department) {
-      console.log("department", department);
+
+    // Vuex action - تحديث القسم مع تحديث المدير ونائب المدير
+    async updateDepartment(
+      { commit },
+      { departmentId, departmentName, managerId, viceManagerId, employees }
+    ) {
       try {
-        const response = await apiClient.updateDepartment({
-          id: department.id,
-          departmentName: department.name,
+        const departmentData = {
+          departmentName: departmentName,
+          managerId: managerId,
+          viceManagerId: viceManagerId,
+          employees: employees.map((emp) => {
+            if (emp.position.name === "Manager") {
+              emp.id = managerId; // تعيين ID المدير
+            } else if (emp.position.name === "Vice Manager") {
+              emp.id = viceManagerId; // تعيين ID نائب المدير
+            }
+            return emp;
+          }),
+        };
+
+        const response = await apiClient.updateDepartment(departmentId, {
+          data: departmentData,
         });
+
+        // عند النجاح، قم بتحديث state في Vuex
         commit("updateDepartment", response.data);
+
         return { success: true, message: "Department updated successfully" };
       } catch (error) {
         console.error("Error updating department:", error);
         return { success: false, message: "Error updating department" };
       }
     },
-
     // projects
 
     async fetchProjects({ commit }) {

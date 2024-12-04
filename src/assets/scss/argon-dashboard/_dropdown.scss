@@ -8,12 +8,14 @@
       animation: $dropdown-animation;
       cursor: pointer;
       opacity: 0;
+      pointer-events: none;
+      transform-origin: $dropdown-transform-origin;
     }
 
     .dropdown-toggle {
       &:after {
         content: "\f107";
-        font: normal normal normal 14px/1 FontAwesome;
+        font: normal normal normal 14px/1 ;
         border: none;
         vertical-align: middle;
         font-weight: $font-weight-bold;
@@ -60,7 +62,7 @@
 
     &.dropdown-hover {
       &:after {
-        content: "";
+        content: "\f0d7";
         position: absolute;
         left: 0;
         bottom: $dropdown-hover-after-bottom-pos;
@@ -166,8 +168,9 @@
         font-family: "FontAwesome";
         content: "\f0d8";
         position: absolute;
-        top: 0;
-        left: $dropdown-animation-arrow-left-position;
+        top: 15;
+        left: 25;
+        color: chartreuse;
         right: auto;
         font-size: $dropdown-animation-arrow-font-size;
         color: $white;

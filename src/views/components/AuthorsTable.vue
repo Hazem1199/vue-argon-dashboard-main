@@ -261,6 +261,7 @@ const successMessage = ref("");
 const openEditModal = (employee) => {
   console.log("employee:", employee.id);
   selectedEmployee.value = employee;
+  console.log("selectedEmployee:", selectedEmployee.value);
   isModalOpen.value = true;
 };
 
@@ -277,6 +278,12 @@ const saveChanges = async () => {
     const userName = selectedEmployee.value.name;
     const departmentId = selectedEmployee.value.departmentId;
     const positionId = selectedEmployee.value.positionId;
+
+    console.log("User ID:", userId);
+    console.log("Role ID:", roleId);
+    console.log("User Name:", userName);
+    console.log("Department ID:", departmentId);
+    console.log("Position ID:", positionId);
 
     await store.dispatch("updateRole", { userId, roleId, userName, departmentId, positionId });
 

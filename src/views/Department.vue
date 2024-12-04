@@ -99,6 +99,7 @@ const addDepartment = async () => {
     const department = {
       departmentName: departmentName.value,
       companyId: companyIId,
+      
     };
     try {
       await store.dispatch("addDepartment", department);
@@ -119,6 +120,7 @@ const addDepartment = async () => {
     } finally {
       isLoading.value = false;
     }
+    departmentName.value = "";
   } else {
     Swal.fire({
       title: t("departmentNameRequired"),

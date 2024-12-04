@@ -113,7 +113,7 @@ const closeMenu = () => {
           id="navbarDropdown"
         >
           <i class="ni ni-single-02 text-info text-sm opacity-10 text-center"></i>
-          <span class="nav-link-text ms-1">Team Work</span>
+          <span class="nav-link-text ms-1">Work Force</span>
         </a>
         <ul
           :class="showMenu ? 'show' : ''"
@@ -156,7 +156,7 @@ const closeMenu = () => {
             :navText="isRTL ? 'الكارتات' : 'Cards'"
           >
             <template v-slot:icon>
-              <i class="ni ni-app text-info text-sm opacity-10"></i>
+              <i class="ni ni-app text-info text-sm opacity-10 "></i>
             </template>
           </sidenav-item>
         </ul>

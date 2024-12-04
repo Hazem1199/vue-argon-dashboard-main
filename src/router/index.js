@@ -128,27 +128,27 @@ const router = createRouter({
 });
 
 // وظيفة للتحقق من بيانات Local Storage
-function isUserAuthenticated() {
-  // تحقق إذا كانت البيانات موجودة في Local Storage
-  const user = localStorage.getItem("user");
-  return !!user; // ترجع true إذا كان المستخدم مسجلاً، وإلا false
-}
+// function isUserAuthenticated() {
+//   // تحقق إذا كانت البيانات موجودة في Local Storage
+//   const user = localStorage.getItem("user");
+//   return !!user; // ترجع true إذا كان المستخدم مسجلاً، وإلا false
+// }
 
 // حارس لكل التنقلات
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = isUserAuthenticated();
+// router.beforeEach((to, from, next) => {
+//   const isAuthenticated = isUserAuthenticated();
 
-  // إذا كان المستخدم مسجلاً ويحاول العودة إلى صفحة تسجيل الدخول أو الصفحة الرئيسية
-  if (isAuthenticated && (to.name === "Signin" || to.name === "/")) {
-    next({ name: "Error" }); // توجيه المستخدم إلى صفحة خطأ
-  } 
-  else if (!isAuthenticated && to.name !== "Signin" && to.name !== "Signup") {
-    // إذا لم يكن المستخدم مسجلاً ويحاول الوصول لصفحات أخرى غير تسجيل الدخول أو التسجيل
-    localStorage.clear();
-    next({ name: "Signin" }); // إعادة توجيه المستخدم إلى صفحة تسجيل الدخول
-  } else {
-    next(); // السماح بالانتقال
-  }
-});
+//   // إذا كان المستخدم مسجلاً ويحاول العودة إلى صفحة تسجيل الدخول أو الصفحة الرئيسية
+//   if (isAuthenticated && (to.name === "Signin" || to.name === "/")) {
+//     next({ name: "Error" }); // توجيه المستخدم إلى صفحة خطأ
+//   } 
+//   else if (!isAuthenticated && to.name !== "Signin" && to.name !== "Signup") {
+//     // إذا لم يكن المستخدم مسجلاً ويحاول الوصول لصفحات أخرى غير تسجيل الدخول أو التسجيل
+//     localStorage.clear();
+//     next({ name: "Signin" }); // إعادة توجيه المستخدم إلى صفحة تسجيل الدخول
+//   } else {
+//     next(); // السماح بالانتقال
+//   }
+// });
 
 export default router;

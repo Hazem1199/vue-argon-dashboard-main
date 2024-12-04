@@ -134,8 +134,12 @@ export default {
   deleteDepartment(departmentId) {
     return apiClient.delete(`/departments/${departmentId}`);
   },
-  updateDepartment(department) {
-    return apiClient.put(`/departments/${department.id}`, { data: { departmentName: department.departmentName } }); 
+
+  updateDepartment(id, department) {
+    console.log("department data:", department);
+    return apiClient.put(`/departments/${id}`, department); 
+    // return apiClient.put(`/starts/${userId}`, updatedData);
+// 
   },
   getPositions() {
     return apiClient.get("/positions").then((response) => {
